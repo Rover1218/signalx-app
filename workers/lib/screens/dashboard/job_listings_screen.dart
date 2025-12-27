@@ -51,36 +51,117 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text(l10n.translate('find_jobs')),
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          // Filters
-          _buildFilters(l10n),
-
-          const SizedBox(height: 16),
-
-          // Jobs List
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _filteredJobs.isEmpty
-                    ? _buildEmptyState(l10n)
-                    : RefreshIndicator(
-                        onRefresh: _loadJobs,
-                        child: ListView.separated(
-                          padding: const EdgeInsets.all(20),
-                          itemCount: _filteredJobs.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 12),
-                          itemBuilder: (context, index) {
-                            return _buildJobCard(_filteredJobs[index], l10n);
-                          },
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: CustomScrollView(
+        slivers: [
+          // Premium Gradient AppBar
+          SliverAppBar(
+            expandedHeight: 140,
+            floating: false,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: const Color(0xFF1E3A8A),
+            leading: IconButton(
+              icon: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
+              ),
+              onPressed: () => Navigator.pop(context),
+            ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF1E3A8A),
+                      Color(0xFF3B82F6),
+                      Color(0xFF1E40AF),
+                    ],
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    // Decorative circles
+                    Positioned(
+                      top: -30,
+                      right: -20,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.05),
                         ),
                       ),
+                    ),
+                    // Content
+                    SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 50, 20, 16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              l10n.translate('find_jobs'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 26,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              '${_jobs.length} jobs available',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
+
+          // Filters
+          SliverToBoxAdapter(
+            child: _buildFilters(l10n),
+          ),
+
+          // Jobs List
+          _isLoading
+              ? const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(color: Color(0xFF3B82F6)),
+                  ),
+                )
+              : _filteredJobs.isEmpty
+                  ? SliverFillRemaining(child: _buildEmptyState(l10n))
+                  : SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => Padding(
+                            padding: const EdgeInsets.only(bottom: 14),
+                            child: _buildJobCard(_filteredJobs[index], l10n),
+                          ),
+                          childCount: _filteredJobs.length,
+                        ),
+                      ),
+                    ),
         ],
       ),
     );
@@ -88,234 +169,325 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
 
   Widget _buildFilters(AppLocalizations l10n) {
     return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: ListView.separated(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        itemCount: _filters.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, index) {
-          final filter = _filters[index];
-          final isSelected = filter == _selectedFilter;
-          
-          // Translate display label
-          String label;
-          if (filter == 'All') {
-            label = l10n.translate('filter_all');
-          } else {
-             // Try to map job types, fallback to original
-             label = l10n.translate('job_type_$filter');
-             if (label.startsWith('job_type_')) label = filter;
-          }
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          children: _filters.map((filter) {
+            final isSelected = filter == _selectedFilter;
+            
+            String label;
+            if (filter == 'All') {
+              label = l10n.translate('filter_all');
+            } else {
+              label = l10n.translate('job_type_$filter');
+              if (label.startsWith('job_type_')) label = filter;
+            }
 
-          return FilterChip(
-            label: Text(label),
-            selected: isSelected,
-            onSelected: (selected) {
-              setState(() => _selectedFilter = filter);
-            },
-            selectedColor: AppColors.primary.withOpacity(0.2),
-            checkmarkColor: AppColors.primary,
-            backgroundColor: Colors.white,
-            labelStyle: TextStyle(
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-            ),
-          );
-        },
+            return Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: GestureDetector(
+                onTap: () => setState(() => _selectedFilter = filter),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  decoration: BoxDecoration(
+                    gradient: isSelected
+                        ? const LinearGradient(
+                            colors: [Color(0xFF3B82F6), Color(0xFF1E40AF)],
+                          )
+                        : null,
+                    color: isSelected ? null : Colors.white,
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(
+                      color: isSelected ? Colors.transparent : Colors.grey.shade200,
+                      width: 1,
+                    ),
+                    boxShadow: isSelected
+                        ? [
+                            BoxShadow(
+                              color: const Color(0xFF3B82F6).withOpacity(0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ]
+                        : [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.03),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isSelected) ...[
+                        const Icon(Icons.check_circle, color: Colors.white, size: 16),
+                        const SizedBox(width: 6),
+                      ],
+                      Text(
+                        label,
+                        style: TextStyle(
+                          color: isSelected ? Colors.white : Colors.grey.shade700,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState(AppLocalizations l10n) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.work_off, size: 64, color: Colors.grey.shade400),
-          const SizedBox(height: 16),
-          Text(
-            l10n.translate('no_jobs_found'),
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade600,
-              fontWeight: FontWeight.w500,
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6).withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.work_off_rounded,
+                size: 56,
+                color: const Color(0xFF3B82F6).withOpacity(0.6),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.translate('check_back_later'),
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade500,
+            const SizedBox(height: 24),
+            Text(
+              l10n.translate('no_jobs_found'),
+              style: const TextStyle(
+                fontSize: 20,
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w600,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 10),
+            Text(
+              l10n.translate('check_back_later'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey.shade500,
+                height: 1.5,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildJobCard(Job job, AppLocalizations l10n) {
-    // Simple translation for 'Just now'
     String displayTime = job.timeAgo;
     if (displayTime == 'Just now') {
       displayTime = l10n.translate('just_now');
     }
 
-    return GestureDetector(
-      onTap: () => _showJobDetails(job),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.grey.shade200,
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.05),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+    // Determine badge color based on time
+    final bool isNew = displayTime == l10n.translate('just_now');
+    final Color badgeColor = isNew ? const Color(0xFF10B981) : const Color(0xFF3B82F6);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.grey.shade100,
+          width: 1,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+            spreadRadius: -2,
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => _showJobDetails(job),
+          child: Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Employer Photo
-                Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        AppColors.primary.withOpacity(0.1),
-                        AppColors.primary.withOpacity(0.05),
-                      ],
-                    ),
-                    border: Border.all(
-                      color: AppColors.primary.withOpacity(0.2),
-                      width: 1.5,
-                    ),
-                  ),
-                  child: ClipOval(
-                    child: job.employerPhoto != null
-                        ? Image.network(job.employerPhoto!, fit: BoxFit.cover)
-                        : Center(
-                            child: Text(
-                              job.employerName.isNotEmpty ? job.employerName[0].toUpperCase() : '?',
-                              style: const TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
+                Row(
+                  children: [
+                    // Employer Photo with gradient border
+                    Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF3B82F6).withOpacity(0.6),
+                            const Color(0xFF1E40AF).withOpacity(0.4),
+                          ],
+                        ),
+                      ),
+                      child: Container(
+                        width: 52,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white,
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              const Color(0xFF3B82F6).withOpacity(0.08),
+                              const Color(0xFF1E40AF).withOpacity(0.04),
+                            ],
                           ),
+                        ),
+                        child: ClipOval(
+                          child: job.employerPhoto != null
+                              ? Image.network(job.employerPhoto!, fit: BoxFit.cover)
+                              : Center(
+                                  child: Text(
+                                    job.employerName.isNotEmpty ? job.employerName[0].toUpperCase() : '?',
+                                    style: const TextStyle(
+                                      color: Color(0xFF3B82F6),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 22,
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 14),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _getTranslatedJobText(job.title, l10n),
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1E293B),
+                              letterSpacing: 0.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _getTranslatedJobText(job.employerName, l10n),
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.grey.shade600,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Time badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: badgeColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: badgeColor.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: Text(
+                        displayTime,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: badgeColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 14),
+
+                // Description preview
+                Text(
+                  _getTranslatedJobText(job.description, l10n),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    height: 1.5,
                   ),
                 ),
 
-                const SizedBox(width: 12),
+                const SizedBox(height: 14),
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                // Location and Salary Row
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
                     children: [
-                      Text(
-                        _getTranslatedJobText(job.title, l10n),
-                        style: const TextStyle(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                          letterSpacing: 0.2,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                      _buildInfoChip(Icons.location_on_rounded, job.location),
+                      const SizedBox(width: 16),
+                      Container(
+                        width: 1,
+                        height: 20,
+                        color: Colors.grey.shade300,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _getTranslatedJobText(job.employerName, l10n),
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      const SizedBox(width: 16),
+                      _buildInfoChip(Icons.currency_rupee_rounded, job.salary, isBold: true),
                     ],
                   ),
                 ),
-
-                // Time ago badge
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: Colors.green.shade200,
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    displayTime,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.green.shade700,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
               ],
             ),
-
-            const SizedBox(height: 12),
-
-            // Description preview
-            Text(
-              _getTranslatedJobText(job.description, l10n),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade700,
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Location and Salary
-            Row(
-              children: [
-                Icon(Icons.location_on, size: 16, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    job.location,
-                    style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Icon(Icons.currency_rupee, size: 16, color: Colors.grey.shade600),
-                const SizedBox(width: 4),
-                Text(
-                  job.salary,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade700,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text, {bool isBold = false}) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 16, color: const Color(0xFF3B82F6)),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 13,
+            color: const Color(0xFF475569),
+            fontWeight: isBold ? FontWeight.w600 : FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 

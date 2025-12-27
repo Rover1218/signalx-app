@@ -147,9 +147,10 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     final l10n = AppLocalizations.of(context);
     
     return SliverAppBar(
-      expandedHeight: 170,
+      expandedHeight: 200,
       floating: false,
       pinned: true,
+      elevation: 0,
       backgroundColor: AppColors.primary,
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
@@ -158,113 +159,214 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                AppColors.primary,
-                AppColors.primaryDark,
+                const Color(0xFF1E3A8A), // Deep blue
+                const Color(0xFF3B82F6), // Bright blue
+                const Color(0xFF1E40AF), // Royal blue
               ],
+              stops: const [0.0, 0.5, 1.0],
             ),
           ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Row(
+          child: Stack(
+            children: [
+              // Decorative circles for depth
+              Positioned(
+                top: -50,
+                right: -30,
+                child: Container(
+                  width: 150,
+                  height: 150,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.05),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: -20,
+                left: -40,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.03),
+                  ),
+                ),
+              ),
+              // Main content
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      // Profile Photo
-                      Container(
-                        width: 68,
-                        height: 68,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.25),
-                              blurRadius: 12,
-                              offset: const Offset(0, 4),
+                      Row(
+                        children: [
+                          // Profile Photo with glow effect
+                          Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: LinearGradient(
+                                colors: [
+                                  Colors.white.withOpacity(0.8),
+                                  Colors.white.withOpacity(0.4),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.2),
+                                  blurRadius: 20,
+                                  spreadRadius: 2,
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: ClipOval(
-                          child: _profile?.photoURL != null
-                              ? Image.network(_profile!.photoURL!, fit: BoxFit.cover)
-                              : Container(
-                                  color: Colors.white,
-                                  child: Center(
-                                    child: Text(
-                                      _profile?.fullName[0].toUpperCase() ?? 'W',
-                                      style: TextStyle(
-                                        fontSize: 28,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.primary,
+                            child: Container(
+                              width: 72,
+                              height: 72,
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white,
+                              ),
+                              child: ClipOval(
+                                child: _profile?.photoURL != null
+                                    ? Image.network(_profile!.photoURL!, fit: BoxFit.cover)
+                                    : Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              AppColors.primary.withOpacity(0.1),
+                                              AppColors.primary.withOpacity(0.05),
+                                            ],
+                                          ),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            _profile?.fullName.isNotEmpty == true 
+                                                ? _profile!.fullName[0].toUpperCase() 
+                                                : 'W',
+                                            style: TextStyle(
+                                              fontSize: 32,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                        ),
                                       ),
+                              ),
+                            ),
+                          ),
+                          
+                          const SizedBox(width: 18),
+                          
+                          // Name and Location
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    l10n.translate('welcome_back_user'),
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.95),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w500,
+                                      letterSpacing: 0.3,
                                     ),
                                   ),
                                 ),
-                        ),
-                      ),
-                      
-                      const SizedBox(width: 16),
-                      
-                      // Name and Location
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              l10n.translate('welcome_back_user'),
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.85),
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              _profile?.fullName ?? l10n.translate('worker'),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.3,
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                Icon(Icons.location_on, color: Colors.white.withOpacity(0.9), size: 15),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    _profile?.location ?? l10n.translate('not_set'),
-                                    style: TextStyle(
-                                      color: Colors.white.withOpacity(0.9),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
+                                const SizedBox(height: 8),
+                                Text(
+                                  _profile?.fullName ?? l10n.translate('worker'),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.location_on, color: Colors.greenAccent.shade200, size: 14),
+                                      const SizedBox(width: 4),
+                                      Flexible(
+                                        child: Text(
+                                          _profile?.location ?? l10n.translate('not_set'),
+                                          style: TextStyle(
+                                            color: Colors.white.withOpacity(0.95),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
-      actions: const [],
+      actions: [
+        // Notification Bell
+        Container(
+          margin: const EdgeInsets.only(right: 16, top: 8),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: Stack(
+              children: [
+                const Icon(Icons.notifications_outlined, color: Colors.white, size: 24),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            onPressed: () {},
+          ),
+        ),
+      ],
     );
   }
 
@@ -284,60 +386,84 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   Widget _buildStatCard(String label, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
             Colors.white,
-            color.withOpacity(0.02),
+            Colors.white.withOpacity(0.95),
+            color.withOpacity(0.03),
           ],
         ),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         border: Border.all(
-          color: color.withOpacity(0.1),
-          width: 1.5,
+          color: color.withOpacity(0.15),
+          width: 1,
         ),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.08),
-            blurRadius: 15,
-            offset: const Offset(0, 6),
+            color: color.withOpacity(0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: -2,
           ),
-          ],
+          BoxShadow(
+            color: Colors.white.withOpacity(0.8),
+            blurRadius: 0,
+            offset: const Offset(-1, -1),
+          ),
+        ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [color.withOpacity(0.15), color.withOpacity(0.08)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  color.withOpacity(0.18),
+                  color.withOpacity(0.08),
+                ],
               ),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: Icon(icon, color: color, size: 22),
+            child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           Text(
             value,
             style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
               color: color,
               letterSpacing: 0.5,
+              height: 1,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             label,
             style: TextStyle(
               fontSize: 11,
-              color: Colors.grey.shade700,
+              color: Colors.grey.shade600,
               fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
             ),
             textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -347,108 +473,243 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   Widget _buildAIInsightsCard() {
     final l10n = AppLocalizations.of(context);
     return Container(
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF667EEA).withOpacity(0.08),
+            const Color(0xFF764BA2).withOpacity(0.05),
+            Colors.white,
+          ],
+        ),
+        border: Border.all(
+          color: const Color(0xFF667EEA).withOpacity(0.15),
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.accent.withOpacity(0.1),
-            blurRadius: 20,
-            offset: const Offset(0, 8),
+            color: const Color(0xFF667EEA).withOpacity(0.12),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+            spreadRadius: -4,
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Stack(
+          children: [
+            // Decorative gradient overlay
+            Positioned(
+              top: -30,
+              right: -30,
+              child: Container(
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [AppColors.accent, AppColors.accent.withOpacity(0.7)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.auto_awesome, color: Colors.white, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                l10n.translate('ai_insights'),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: AppColors.accent,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  l10n.translate('new_badge'),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      const Color(0xFF667EEA).withOpacity(0.15),
+                      Colors.transparent,
+                    ],
                   ),
                 ),
               ),
-            ],
-          ),
-          
-          const SizedBox(height: 20),
-          
-          _buildInsightItem(
-            Icons.work, 
-            '${_recommendedJobs.length} ${l10n.translate('jobs_match_skills')}', 
-            AppColors.primary
-          ),
-          const SizedBox(height: 12),
-          _buildInsightItem(
-            Icons.account_balance, 
-            '2 ${l10n.translate('schemes_available')}', 
-            AppColors.secondary
-          ),
-          const SizedBox(height: 12),
-          _buildInsightItem(
-            Icons.location_on, 
-            l10n.translate('work_in_block'), 
-            Colors.orange
-          ),
-        ],
+            ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.all(22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      // AI Icon with animated gradient
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              Color(0xFF667EEA),
+                              Color(0xFF764BA2),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(14),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF667EEA).withOpacity(0.4),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(Icons.auto_awesome, color: Colors.white, size: 24),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.translate('ai_insights'),
+                              style: const TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Powered by AI',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey.shade500,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      // Animated NEW badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF667EEA).withOpacity(0.3),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                color: Colors.greenAccent.shade200,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              l10n.translate('new_badge'),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 24),
+                  
+                  // Insights with enhanced styling
+                  _buildInsightItem(
+                    Icons.work_rounded, 
+                    '${_recommendedJobs.length} ${l10n.translate('jobs_match_skills')}', 
+                    const Color(0xFF3B82F6),
+                    'jobs'
+                  ),
+                  const SizedBox(height: 14),
+                  _buildInsightItem(
+                    Icons.account_balance_rounded, 
+                    '2 ${l10n.translate('schemes_available')}', 
+                    const Color(0xFF10B981),
+                    'schemes'
+                  ),
+                  const SizedBox(height: 14),
+                  _buildInsightItem(
+                    Icons.location_on_rounded, 
+                    l10n.translate('work_in_block'), 
+                    const Color(0xFFF59E0B),
+                    'location'
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildInsightItem(IconData icon, String text, Color color) {
-    return Row(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+  Widget _buildInsightItem(IconData icon, String text, Color color, String type) {
+    return GestureDetector(
+      onTap: () {
+        if (type == 'jobs' || type == 'location') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen()));
+        } else if (type == 'schemes') {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesScreen()));
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: color.withOpacity(0.12),
+            width: 1,
           ),
-          child: Icon(icon, color: color, size: 18),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            text,
-            style: const TextStyle(
-              fontSize: 14,
-              color: AppColors.textPrimary,
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
+          ],
         ),
-        Icon(Icons.arrow_forward_ios, color: Colors.grey.shade400, size: 14),
-      ],
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textPrimary,
+                  height: 1.3,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.arrow_forward_ios_rounded, color: color, size: 14),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -554,57 +815,96 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              l10n.translate('recent_jobs_title'),
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.work_rounded, color: AppColors.primary, size: 18),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  l10n.translate('recent_jobs_title'),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
             ),
             GestureDetector(
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen())),
-              child: Text(
-                l10n.translate('see_all'),
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      l10n.translate('see_all'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.primary),
+                  ],
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
         
         if (_recommendedJobs.isEmpty)
           Container(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(40),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Colors.grey.shade200),
             ),
             child: Center(
               child: Column(
                 children: [
-                  Icon(Icons.work_off_outlined, size: 48, color: Colors.grey.shade400),
-                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.work_off_outlined, size: 40, color: Colors.grey.shade400),
+                  ),
+                  const SizedBox(height: 16),
                   Text(
                     l10n.translate('no_jobs_yet'),
-                    style: TextStyle(color: Colors.grey.shade600),
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ],
               ),
             ),
           )
         else
-          ...(_recommendedJobs.map((job) => _buildJobCard(job, l10n)).toList()), // Pass l10n here
+          ...(_recommendedJobs.map((job) => _buildJobCard(job, l10n)).toList()),
       ],
     );
   }
 
   Widget _buildJobCard(Job job, AppLocalizations l10n) {
-    // Helper to translate dynamic text - duplicated from JobListingsScreen for now as it's a small helper
     String getTranslatedJobText(String text) {
         if (text.isEmpty) return text;
         final directKey = 'job_$text';
@@ -621,89 +921,139 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       displayTime = l10n.translate('just_now');
     }
 
+    // Determine badge color based on time
+    Color badgeColor = displayTime == l10n.translate('just_now') 
+        ? const Color(0xFF10B981) // Green for just now
+        : const Color(0xFF3B82F6); // Blue for older
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: Colors.grey.shade100,
+          width: 1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
+            blurRadius: 12,
             offset: const Offset(0, 4),
+            spreadRadius: -2,
           ),
         ],
       ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.work, color: AppColors.primary),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(18),
+          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen())),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Text(
-                  getTranslatedJobText(job.title),
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                    color: AppColors.textPrimary,
+                // Job Icon/Image
+                Container(
+                  width: 54,
+                  height: 54,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        AppColors.primary.withOpacity(0.15),
+                        AppColors.primary.withOpacity(0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.work_rounded, color: AppColors.primary, size: 26),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        getTranslatedJobText(job.title),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 15,
+                          color: AppColors.textPrimary,
+                          letterSpacing: 0.2,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        getTranslatedJobText(job.employerName),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _buildJobInfoChip(Icons.location_on_outlined, job.location),
+                          const SizedBox(width: 12),
+                          _buildJobInfoChip(Icons.currency_rupee, job.salary),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  getTranslatedJobText(job.employerName),
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey.shade600,
+                // Time badge
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: badgeColor.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: badgeColor.withOpacity(0.2),
+                      width: 1,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Icon(Icons.location_on_outlined, size: 14, color: Colors.grey.shade500),
-                    const SizedBox(width: 4),
-                    Text(
-                      job.location,
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
+                  child: Text(
+                    displayTime,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: badgeColor,
+                      letterSpacing: 0.2,
                     ),
-                    const SizedBox(width: 12),
-                    Icon(Icons.currency_rupee, size: 14, color: Colors.grey.shade500),
-                    Text(
-                      job.salary,
-                      style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: AppColors.secondary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              displayTime,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppColors.secondary,
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildJobInfoChip(IconData icon, String text) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: Colors.grey.shade500),
+        const SizedBox(width: 3),
+        Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
     );
   }
 
@@ -712,25 +1062,30 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -5),
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, -8),
+            spreadRadius: -4,
           ),
         ],
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildNavItem(Icons.home_rounded, l10n.translate('nav_home'), true),
-              _buildNavItem(Icons.search_rounded, l10n.translate('nav_jobs'), false, onTap: () {
+              _buildNavItem(Icons.work_rounded, l10n.translate('nav_jobs'), false, onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen()));
               }),
-              _buildNavItem(Icons.account_balance_wallet_rounded, l10n.translate('nav_schemes'), false, onTap: () {
+              _buildNavItem(Icons.account_balance_rounded, l10n.translate('nav_schemes'), false, onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesScreen()));
               }),
               _buildNavItem(Icons.person_rounded, l10n.translate('nav_profile'), false, onTap: () {
@@ -746,24 +1101,47 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   Widget _buildNavItem(IconData icon, String label, bool isActive, {VoidCallback? onTap}) {
     return GestureDetector(
       onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isActive ? AppColors.primary : Colors.grey.shade400,
-            size: 26,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-              color: isActive ? AppColors.primary : Colors.grey.shade500,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: EdgeInsets.symmetric(
+          horizontal: isActive ? 16 : 12,
+          vertical: 8,
+        ),
+        decoration: BoxDecoration(
+          color: isActive ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isActive ? AppColors.primary : Colors.grey.shade400,
+              size: isActive ? 26 : 24,
             ),
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: isActive ? 11 : 10,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                color: isActive ? AppColors.primary : Colors.grey.shade500,
+                letterSpacing: 0.2,
+              ),
+            ),
+            if (isActive) ...[
+              const SizedBox(height: 4),
+              Container(
+                width: 5,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
