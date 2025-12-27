@@ -41,8 +41,10 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         _profile = WorkerProfile.fromMap(profileData);
       }
 
+      // Fetch jobs matching worker's skills and location
       final jobsData = await FirebaseService.getJobs(
-        location: _profile?.district,
+        workerSkills: _profile?.skills ?? [],
+        workerLocation: _profile?.district ?? _profile?.location,
         limit: 5,
       );
       _recommendedJobs = jobsData.map((data) => Job.fromMap(data)).toList();
@@ -140,7 +142,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   Widget _buildSliverAppBar() {
     return SliverAppBar(
-      expandedHeight: 200,
+      expandedHeight: 170,
       floating: false,
       pinned: true,
       backgroundColor: AppColors.primary,
@@ -167,15 +169,16 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                     children: [
                       // Profile Photo
                       Container(
-                        width: 60,
-                        height: 60,
+                        width: 68,
+                        height: 68,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 3),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.2),
-                              blurRadius: 10,
+                              color: Colors.black.withOpacity(0.25),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
                           ],
                         ),
@@ -188,7 +191,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                                     child: Text(
                                       _profile?.fullName[0].toUpperCase() ?? 'W',
                                       style: TextStyle(
-                                        fontSize: 24,
+                                        fontSize: 28,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.primary,
                                       ),
@@ -200,16 +203,18 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                       
                       const SizedBox(width: 16),
                       
-                      // Welcome Text
+                      // Name and Location
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
                               'Welcome back,',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
+                                color: Colors.white.withOpacity(0.85),
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -219,40 +224,31 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                                 color: Colors.white,
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
+                                letterSpacing: 0.3,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Icon(Icons.location_on, color: Colors.white.withOpacity(0.9), size: 15),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    _profile?.location ?? 'Location not set',
+                                    style: TextStyle(
+                                      color: Colors.white.withOpacity(0.9),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
-                        ),
-                      ),
-                      
-                      // Notification Bell
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.notifications_outlined,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 16),
-                  
-                  // Location & Skills
-                  Row(
-                    children: [
-                      Icon(Icons.location_on, color: Colors.white.withOpacity(0.8), size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        _profile?.location ?? 'Location not set',
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.9),
-                          fontSize: 13,
                         ),
                       ),
                     ],
@@ -270,54 +266,69 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   Widget _buildStatsRow() {
     return Row(
       children: [
-        Expanded(child: _buildStatCard('Jobs Applied', '0', Icons.work_outline, AppColors.primary)),
+        Expanded(child: _buildStatCard('Recommended', '${_recommendedJobs.length}', Icons.work_outline, AppColors.primary)),
         const SizedBox(width: 12),
-        Expanded(child: _buildStatCard('Interviews', '0', Icons.calendar_today, AppColors.secondary)),
+        Expanded(child: _buildStatCard('Rating', '${_profile?.rating ?? 0}', Icons.star_outline, AppColors.secondary)),
         const SizedBox(width: 12),
-        Expanded(child: _buildStatCard('Saved', '0', Icons.bookmark_outline, AppColors.accent)),
+        Expanded(child: _buildStatCard('Skills', '${_profile?.skills.length ?? 0}', Icons.construction_outlined, AppColors.accent)),
       ],
     );
   }
 
   Widget _buildStatCard(String label, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white,
+            color.withOpacity(0.02),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: color.withOpacity(0.1),
+          width: 1.5,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: color.withOpacity(0.08),
+            blurRadius: 15,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              gradient: LinearGradient(
+                colors: [color.withOpacity(0.15), color.withOpacity(0.08)],
+              ),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 20),
+            child: Icon(icon, color: color, size: 22),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Text(
             value,
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 26,
               fontWeight: FontWeight.bold,
               color: color,
+              letterSpacing: 0.5,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           Text(
             label,
             style: TextStyle(
               fontSize: 11,
-              color: Colors.grey.shade600,
+              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w600,
             ),
             textAlign: TextAlign.center,
           ),
@@ -330,16 +341,15 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.accent.withOpacity(0.1),
-            AppColors.primary.withOpacity(0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.accent.withOpacity(0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.accent.withOpacity(0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,10 +359,12 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.accent.withOpacity(0.2),
+                  gradient: LinearGradient(
+                    colors: [AppColors.accent, AppColors.accent.withOpacity(0.7)],
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.auto_awesome, color: AppColors.accent, size: 22),
+                child: const Icon(Icons.auto_awesome, color: Colors.white, size: 22),
               ),
               const SizedBox(width: 12),
               const Text(

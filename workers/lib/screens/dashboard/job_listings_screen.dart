@@ -144,14 +144,18 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
     return GestureDetector(
       onTap: () => _showJobDetails(job),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.grey.shade200,
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
+              color: AppColors.primary.withOpacity(0.05),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
@@ -162,21 +166,36 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
             Row(
               children: [
                 // Employer Photo
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: AppColors.primary.withOpacity(0.1),
-                  backgroundImage: job.employerPhoto != null
-                      ? NetworkImage(job.employerPhoto!)
-                      : null,
-                  child: job.employerPhoto == null
-                      ? Text(
-                          job.employerName[0].toUpperCase(),
-                          style: const TextStyle(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.primary.withOpacity(0.1),
+                        AppColors.primary.withOpacity(0.05),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: AppColors.primary.withOpacity(0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: ClipOval(
+                    child: job.employerPhoto != null
+                        ? Image.network(job.employerPhoto!, fit: BoxFit.cover)
+                        : Center(
+                            child: Text(
+                              job.employerName[0].toUpperCase(),
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
                           ),
-                        )
-                      : null,
+                  ),
                 ),
 
                 const SizedBox(width: 12),
@@ -188,18 +207,24 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
                       Text(
                         job.title,
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
+                          letterSpacing: 0.2,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Text(
                         job.employerName,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondary,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey.shade600,
+                          fontWeight: FontWeight.w500,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -207,17 +232,21 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
 
                 // Time ago badge
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.green.shade50,
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: Colors.green.shade200,
+                      width: 1,
+                    ),
                   ),
                   child: Text(
                     job.timeAgo,
                     style: TextStyle(
                       fontSize: 11,
                       color: Colors.green.shade700,
-                      fontWeight: FontWeight.w500,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -362,24 +391,48 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
 
                         const SizedBox(height: 24),
 
-                        // Requirements
+                        // Skills
                         const Text(
-                          'Requirements',
+                          'Skills',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: AppColors.textPrimary,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          job.requirements,
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Colors.grey.shade700,
-                            height: 1.5,
+                        const SizedBox(height: 12),
+                        if (job.skills.isEmpty)
+                          Text(
+                            'No specific skills listed',
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.grey.shade600,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          )
+                        else
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: job.skills.map((skill) {
+                              return Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                                ),
+                                child: Text(
+                                  skill,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
                           ),
-                        ),
 
                         const SizedBox(height: 32),
 

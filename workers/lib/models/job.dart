@@ -11,6 +11,7 @@ class Job {
   final String? employerPhoto;
   final String employerId;
   final bool isPublic;
+  final List<String> skills;
   final DateTime? scheduledDate;
   final DateTime createdAt;
 
@@ -27,6 +28,7 @@ class Job {
     this.employerPhoto,
     required this.employerId,
     this.isPublic = true,
+    required this.skills,
     this.scheduledDate,
     required this.createdAt,
   });
@@ -45,6 +47,7 @@ class Job {
       employerPhoto: map['employerPhoto'],
       employerId: map['recruiterId'] ?? '',
       isPublic: map['isPublic'] ?? true,
+      skills: List<String>.from(map['skills'] ?? []),
       scheduledDate: map['scheduledDate']?.toDate(),
       createdAt: map['createdAt']?.toDate() ?? DateTime.now(),
     );

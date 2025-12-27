@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_constants.dart';
+import '../../services/groq_service.dart';
 
 class AIAssistantScreen extends StatefulWidget {
   const AIAssistantScreen({super.key});
@@ -11,6 +12,7 @@ class AIAssistantScreen extends StatefulWidget {
 class _AIAssistantScreenState extends State<AIAssistantScreen> {
   final _messageController = TextEditingController();
   final List<Map<String, String>> _messages = [];
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -18,36 +20,39 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
     super.dispose();
   }
 
-  void _sendMessage() {
-    if (_messageController.text.trim().isEmpty) return;
+  Future<void> _sendMessage() async {
+    if (_messageController.text.trim().isEmpty || _isLoading) return;
+
+    final userMessage = _messageController.text.trim();
+    _messageController.clear();
 
     setState(() {
       _messages.add({
         'type': 'user',
-        'text': _messageController.text.trim(),
+        'text': userMessage,
       });
-
-      // Simulate AI response
-      _messages.add({
-        'type': 'ai',
-        'text': _getAIResponse(_messageController.text.trim()),
-      });
+      _isLoading = true;
     });
 
-    _messageController.clear();
-  }
-
-  String _getAIResponse(String query) {
-    final lowerQuery = query.toLowerCase();
-
-    if (lowerQuery.contains('job') || lowerQuery.contains('work')) {
-      return 'I found several job opportunities for you! Check the "Find Jobs" section to see positions matching your skills in construction, agriculture, and more.';
-    } else if (lowerQuery.contains('scheme') || lowerQuery.contains('government')) {
-      return 'You may be eligible for several government schemes:\n\n• MGNREGA - 100 days work guarantee\n• Lakshmir Bhandar - Cash support for women\n• PM-SVANidhi - Loans for vendors\n\nVisit the "Schemes" section for details!';
-    } else if (lowerQuery.contains('skill') || lowerQuery.contains('training')) {
-      return 'Karma Sathi Prakalpa offers skill development programs in West Bengal. You can learn new skills like tailoring, electronics, or computer basics to improve job opportunities.';
-    } else {
-      return 'I\'m here to help you find jobs, learn about government schemes, and improve your livelihood. Try asking about:\n\n• Available jobs\n• Government schemes\n• Skill training programs';
+    try {
+      // Call Groq AI
+      final aiResponse = await GroqService.sendMessage(userMessage);
+      
+      setState(() {
+        _messages.add({
+          'type': 'ai',
+          'text': aiResponse,
+        });
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _messages.add({
+          'type': 'ai',
+          'text': 'I apologize, but I\'m having trouble processing your request. Please try again.',
+        });
+        _isLoading = false;
+      });
     }
   }
 
@@ -58,6 +63,14 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
       appBar: AppBar(
         title: const Text('AI Assistant'),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              _showInfoDialog();
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -67,21 +80,22 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.purple.shade50, Colors.blue.shade50],
+                colors: [AppColors.primary.withOpacity(0.1), AppColors.secondary.withOpacity(0.1)],
               ),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.purple.shade100),
+              border: Border.all(color: AppColors.primary.withOpacity(0.3)),
             ),
             child: Row(
               children: [
-                Icon(Icons.lightbulb, color: Colors.purple.shade700),
+                Icon(Icons.auto_awesome, color: AppColors.primary),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Ask me about jobs, schemes, or training!',
+                    'Powered by Google Gemini AI - Ask anything about jobs, schemes, or livelihoods!',
                     style: TextStyle(
-                      color: Colors.purple.shade900,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
+                      fontSize: 13,
                     ),
                   ),
                 ),
@@ -95,8 +109,11 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                 ? _buildEmptyState()
                 : ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _messages.length,
+                    itemCount: _messages.length + (_isLoading ? 1 : 0),
                     itemBuilder: (context, index) {
+                      if (index == _messages.length && _isLoading) {
+                        return _buildLoadingIndicator();
+                      }
                       return _buildMessage(_messages[index]);
                     },
                   ),
@@ -104,6 +121,40 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
 
           // Input
           _buildInput(),
+        ],
+      ),
+    );
+  }
+
+  void _showInfoDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('About AI Assistant'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'This AI assistant is trained specifically for West Bengal\'s livelihood ecosystem.',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 12),
+            Text('You can ask about:'),
+            SizedBox(height: 8),
+            Text('• Job opportunities in your area'),
+            Text('• Government schemes (MGNREGA, Lakshmir Bhandar, etc.)'),
+            Text('• Skill training programs'),
+            Text('• Livelihood advice for your district/block'),
+            Text('• Agricultural opportunities'),
+            Text('• Self-employment guidance'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Got it'),
+          ),
         ],
       ),
     );
@@ -132,7 +183,66 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
               color: Colors.grey.shade500,
             ),
           ),
+          const SizedBox(height: 24),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.center,
+            children: [
+              _buildSuggestionChip('What jobs are available in my area?'),
+              _buildSuggestionChip('Tell me about MGNREGA'),
+              _buildSuggestionChip('What schemes am I eligible for?'),
+              _buildSuggestionChip('How to start a small business?'),
+            ],
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSuggestionChip(String text) {
+    return ActionChip(
+      label: Text(text, style: const TextStyle(fontSize: 12)),
+      onPressed: () {
+        _messageController.text = text;
+        _sendMessage();
+      },
+      backgroundColor: AppColors.primary.withOpacity(0.1),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Thinking...',
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 15,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -181,8 +291,9 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
           Expanded(
             child: TextField(
               controller: _messageController,
+              enabled: !_isLoading,
               decoration: InputDecoration(
-                hintText: 'Ask me anything...',
+                hintText: _isLoading ? 'Waiting for response...' : 'Ask me anything...',
                 filled: true,
                 fillColor: AppColors.background,
                 border: OutlineInputBorder(
@@ -195,16 +306,18 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                 ),
               ),
               onSubmitted: (_) => _sendMessage(),
+              maxLines: null,
+              textInputAction: TextInputAction.send,
             ),
           ),
           const SizedBox(width: 8),
           Container(
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: _isLoading ? Colors.grey : AppColors.primary,
               shape: BoxShape.circle,
             ),
             child: IconButton(
-              onPressed: _sendMessage,
+              onPressed: _isLoading ? null : _sendMessage,
               icon: const Icon(Icons.send, color: Colors.white),
             ),
           ),

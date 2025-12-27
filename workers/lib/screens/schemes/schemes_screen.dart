@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_constants.dart';
 
 class SchemesScreen extends StatelessWidget {
@@ -13,6 +14,7 @@ class SchemesScreen extends StatelessWidget {
         'eligibility': 'Rural adults willing to do manual work',
         'icon': Icons.construction,
         'color': Colors.green,
+        'url': 'https://nrega.nic.in/',
       },
       {
         'name': 'PM-SVANidhi',
@@ -20,6 +22,7 @@ class SchemesScreen extends StatelessWidget {
         'eligibility': 'Street vendors with certificate',
         'icon': Icons.store,
         'color': Colors.blue,
+        'url': 'https://pmsvanidhi.mohua.gov.in/',
       },
       {
         'name': 'Lakshmir Bhandar',
@@ -27,6 +30,7 @@ class SchemesScreen extends StatelessWidget {
         'eligibility': 'Women aged 25-60 in West Bengal',
         'icon': Icons.account_balance_wallet,
         'color': Colors.purple,
+        'url': 'https://wb.gov.in/portal/web/guest/lakshmir-bhandar',
       },
       {
         'name': 'Karma Sathi Prakalpa',
@@ -34,6 +38,7 @@ class SchemesScreen extends StatelessWidget {
         'eligibility': 'Job seekers in West Bengal',
         'icon': Icons.work,
         'color': Colors.orange,
+        'url': 'https://karmasathiprakalpa.wb.gov.in/',
       },
       {
         'name': 'Bhabishyat Credit Card',
@@ -41,6 +46,7 @@ class SchemesScreen extends StatelessWidget {
         'eligibility': 'Youth for self-employment/business',
         'icon': Icons.credit_card,
         'color': Colors.teal,
+        'url': 'https://wbmsme.gov.in/bhabishyat-credit-card/',
       },
       {
         'name': 'PM-KISAN',
@@ -48,6 +54,7 @@ class SchemesScreen extends StatelessWidget {
         'eligibility': 'Farmer families',
         'icon': Icons.agriculture,
         'color': Colors.brown,
+        'url': 'https://pmkisan.gov.in/',
       },
     ];
 
@@ -160,22 +167,23 @@ class SchemesScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
+                  child: ElevatedButton.icon(
                     onPressed: () {
-                      _showSchemeDetails(context, scheme);
+                      _openSchemeUrl(scheme['url'] as String);
                     },
+                    icon: const Icon(Icons.open_in_new, size: 18),
+                    label: const Text(
+                      'Learn More',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: scheme['color'],
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: const Text(
-                      'Check Eligibility',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
@@ -186,6 +194,18 @@ class SchemesScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _openSchemeUrl(String url) async {
+    try {
+      final uri = Uri.parse(url);
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
+    }
   }
 
   void _showSchemeDetails(BuildContext context, Map<String, dynamic> scheme) {

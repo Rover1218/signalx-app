@@ -4,6 +4,7 @@ import '../../services/firebase_service.dart';
 import '../../models/worker_profile.dart';
 import '../../constants/app_constants.dart';
 import '../auth/otp_login_screen.dart';
+import 'edit_profile_screen.dart';
 
 class WorkerProfileScreen extends StatefulWidget {
   const WorkerProfileScreen({super.key});
@@ -161,6 +162,24 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
               ),
             ),
             title: const Text('My Profile'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.edit, color: Colors.white),
+                onPressed: () async {
+                  if (_profile != null) {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => EditProfileScreen(profile: _profile!),
+                      ),
+                    );
+                    if (result == true) {
+                      _loadProfile(); // Reload if changes saved
+                    }
+                  }
+                },
+              ),
+            ],
           ),
           
           // Content
@@ -289,7 +308,6 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: Colors.grey.shade400),
         ],
       ),
     );

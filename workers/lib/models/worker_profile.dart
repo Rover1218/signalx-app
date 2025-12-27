@@ -11,6 +11,7 @@ class WorkerProfile {
   final String? educationLevel;
   final String? aadhaarNumber;
   final List<String> preferredJobTypes;
+  final int rating;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -27,6 +28,7 @@ class WorkerProfile {
     this.educationLevel,
     this.aadhaarNumber,
     this.preferredJobTypes = const [],
+    this.rating = 0,
     this.createdAt,
     this.updatedAt,
   });
@@ -45,6 +47,7 @@ class WorkerProfile {
       educationLevel: map['educationLevel'],
       aadhaarNumber: map['aadhaarNumber'],
       preferredJobTypes: List<String>.from(map['preferredJobTypes'] ?? []),
+      rating: map['rating'] ?? 0,
       createdAt: map['createdAt']?.toDate(),
       updatedAt: map['updatedAt']?.toDate(),
     );
@@ -64,6 +67,7 @@ class WorkerProfile {
       'educationLevel': educationLevel,
       'aadhaarNumber': aadhaarNumber,
       'preferredJobTypes': preferredJobTypes,
+      'rating': rating,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

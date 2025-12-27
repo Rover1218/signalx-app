@@ -94,32 +94,90 @@ class FirebaseService {
     }
   }
 
-  // Get all jobs
+  // Get jobs matching worker skills and region
   static Future<List<Map<String, dynamic>>> getJobs({
-    String? location,
+    List<String>? workerSkills,
+    String? workerLocation,
     int limit = 50,
   }) async {
     try {
-      Query query = _firestore
+      // Fetch all public jobs (we'll filter client-side)
+      final snapshot = await _firestore
           .collection('jobs')
           .where('isPublic', isEqualTo: true)
           .orderBy('createdAt', descending: true)
-          .limit(limit);
+          .limit(limit * 2) // Fetch more to allow filtering
+          .get();
 
-      if (location != null && location.isNotEmpty) {
-        query = query.where('location', isEqualTo: location);
-      }
-
-      final snapshot = await query.get();
-      return snapshot.docs.map((doc) {
+      List<Map<String, dynamic>> allJobs = snapshot.docs.map((doc) {
         return {
           'id': doc.id,
           ...doc.data() as Map<String, dynamic>,
         };
       }).toList();
+
+      // If no filters, return all
+      if (workerSkills == null && workerLocation == null) {
+        return allJobs.take(limit).toList();
+      }
+
+      // Client-side filtering
+      List<Map<String, dynamic>> filteredJobs = allJobs.where((job) {
+        bool skillMatch = false;
+        bool regionMatch = false;
+
+        // Check skill match
+        if (workerSkills != null && workerSkills.isNotEmpty) {
+          List<String> jobSkills = List<String>.from(job['skills'] ?? []);
+          skillMatch = workerSkills.any((skill) => jobSkills.contains(skill));
+        }
+
+        // Check region match (flexible location matching)
+        if (workerLocation != null && workerLocation.isNotEmpty) {
+          String jobLocation = (job['location'] ?? '').toString().toLowerCase();
+          String workerLoc = workerLocation.toLowerCase();
+          
+          // Extract district/state for smart matching
+          regionMatch = jobLocation.contains(workerLoc) || 
+                       workerLoc.contains(jobLocation) ||
+                       _isSameRegion(jobLocation, workerLoc);
+        }
+
+        // Show job if EITHER skills match OR region matches
+        return (workerSkills != null ? skillMatch : true) || 
+               (workerLocation != null ? regionMatch : true);
+      }).toList();
+
+      return filteredJobs.take(limit).toList();
     } catch (e) {
       throw Exception('Failed to fetch jobs: ${e.toString()}');
     }
+  }
+
+  // Helper: Check if two locations are in same region
+  static bool _isSameRegion(String loc1, String loc2) {
+    // Extract common parts (district/state)
+    final commonRegions = ['west bengal', 'bengal', 'kolkata'];
+    
+    for (var region in commonRegions) {
+      if (loc1.contains(region) && loc2.contains(region)) {
+        return true;
+      }
+    }
+    
+    // Check for district names
+    final districts = [
+      'murshidabad', 'north 24 parganas', 'south 24 parganas',
+      'howrah', 'hooghly', 'nadia', 'bardhaman'
+    ];
+    
+    for (var district in districts) {
+      if (loc1.contains(district) && loc2.contains(district)) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   // Get job by ID

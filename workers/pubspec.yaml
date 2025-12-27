@@ -53,6 +53,12 @@ dependencies:
   http: ^1.2.2
   flutter_dotenv: ^5.2.1
   crypto: ^3.0.6
+  
+  # Google Gemini AI
+  google_generative_ai: ^0.4.6
+  
+  # URL Launcher for opening links
+  url_launcher: ^6.3.1
 
 dev_dependencies:
   flutter_test:
