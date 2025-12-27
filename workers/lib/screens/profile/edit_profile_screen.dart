@@ -16,6 +16,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
+  late TextEditingController _emailController;
   late TextEditingController _districtController;
   late TextEditingController _blockController;
   late TextEditingController _villageController;
@@ -29,6 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.initState();
     _nameController = TextEditingController(text: widget.profile.fullName);
     _phoneController = TextEditingController(text: widget.profile.phoneNumber);
+    _emailController = TextEditingController(text: widget.profile.email ?? '');
     _districtController = TextEditingController(text: widget.profile.district ?? '');
     _blockController = TextEditingController(text: widget.profile.block ?? '');
     _villageController = TextEditingController(text: widget.profile.village ?? '');
@@ -40,6 +42,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void dispose() {
     _nameController.dispose();
     _phoneController.dispose();
+    _emailController.dispose();
     _districtController.dispose();
     _blockController.dispose();
     _villageController.dispose();
@@ -60,6 +63,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final updatedData = {
         'fullName': _nameController.text.trim(),
         'phoneNumber': _phoneController.text.trim(),
+        'email': _emailController.text.trim(),
         'district': _districtController.text.trim(),
         'block': _blockController.text.trim(),
         'village': _villageController.text.trim(),
@@ -122,6 +126,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 label: 'Phone Number',
                 icon: Icons.phone,
                 readOnly: true,
+              ),
+              const SizedBox(height: 16),
+              _buildTextField(
+                controller: _emailController,
+                label: 'Email / Gmail', // User specifically asked for Gmail
+                icon: Icons.email,
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
               _buildTextField(

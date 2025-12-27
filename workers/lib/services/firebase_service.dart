@@ -215,7 +215,7 @@ class FirebaseService {
     }
   }
 
-  // Get worker's applications
+  // Get worker's applications with job details
   static Future<List<Map<String, dynamic>>> getWorkerApplications(
     String workerId,
   ) async {
@@ -223,15 +223,37 @@ class FirebaseService {
       final snapshot = await _firestore
           .collection('applications')
           .where('workerId', isEqualTo: workerId)
-          .orderBy('appliedAt', descending: true)
           .get();
 
-      return snapshot.docs.map((doc) {
-        return {
-          'id': doc.id,
-          ...doc.data(),
-        };
-      }).toList();
+      List<Map<String, dynamic>> applications = [];
+
+      for (var doc in snapshot.docs) {
+        Map<String, dynamic> appData = doc.data();
+        appData['id'] = doc.id;
+
+        // Fetch job details
+        if (appData['jobId'] != null) {
+          final jobSnapshot = await _firestore
+              .collection('jobs')
+              .doc(appData['jobId'])
+              .get();
+          
+          if (jobSnapshot.exists) {
+            appData['job'] = jobSnapshot.data();
+          }
+        }
+        
+        applications.add(appData);
+      }
+
+      // Client-side sorting
+      applications.sort((a, b) {
+        final aTime = (a['appliedAt'] as Timestamp?)?.toDate() ?? DateTime(0);
+        final bTime = (b['appliedAt'] as Timestamp?)?.toDate() ?? DateTime(0);
+        return bTime.compareTo(aTime);
+      });
+
+      return applications;
     } catch (e) {
       throw Exception('Failed to fetch applications: ${e.toString()}');
     }

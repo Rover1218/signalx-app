@@ -15,6 +15,10 @@ class AppLocalizations {
   static Map<String, Map<String, String>> get _localizedValues => {
     // ENGLISH
     'en': {
+      // Generic
+      'unknown_job': 'Unknown Job',
+      'error_loading_applications': 'Error loading applications',
+      
       // Common
       'app_name': 'Workers',
       'tagline': 'Find the right worker for any job',
@@ -235,6 +239,10 @@ class AppLocalizations {
 
     // HINDI
     'hi': {
+      // Generic
+      'unknown_job': 'अज्ञात नौकरी',
+      'error_loading_applications': 'आवेदन लोड नहीं हो सके',
+
       // Common
       'app_name': 'वर्कर्स',
       'tagline': 'किसी भी काम के लिए सही कर्मचारी खोजें',
@@ -455,6 +463,10 @@ class AppLocalizations {
 
     // BENGALI
     'bn': {
+      // Generic
+      'unknown_job': 'অজানা কাজ',
+      'error_loading_applications': 'আবেদন লোড করতে সমস্যা',
+
       // Common
       'app_name': 'ওয়ার্কার্স',
       'tagline': 'যেকোনো কাজের জন্য সঠিক কর্মী খুঁজুন',
@@ -603,6 +615,17 @@ class AppLocalizations {
       'scheme_pmsvanidhi_name': 'পিএম-স্বনিধি',
       'scheme_pmsvanidhi_desc': 'রাস্তার হকারদের জন্য মাইক্রো-ক্রেডিট স্কিম',
       'scheme_pmsvanidhi_elig': 'সার্টিফিকেটধারী রাস্তার হকাররা',
+
+      // My Applications
+      'my_applications': 'আমার আবেদনসমূহ',
+      'application_status': 'আবেদনের স্ট্যাটাস',
+      'status_pending': 'বিচারাধীন',
+      'status_accepted': 'গৃহীত',
+      'status_rejected': 'প্রত্যাখ্যাত',
+      'status_shortlisted': 'বাছাইকৃত',
+      'applied_on': 'আবেদনের তারিখ',
+      'view_job': 'কাজটি দেখুন',
+      'no_applications': 'আপনি এখনও কোনো কাজের জন্য আবেদন করেননি',
       
       'scheme_lakshmir_name': 'লক্ষ্মীর ভাণ্ডার',
       'scheme_lakshmir_desc': 'নারীদের জন্য মাসিক আর্থিক সহায়তা (₹১,০০০-১,২০০/মাস)',

@@ -5,6 +5,7 @@ import '../../models/worker_profile.dart';
 import '../../constants/app_constants.dart';
 import '../auth/otp_login_screen.dart';
 import 'edit_profile_screen.dart';
+import 'my_applications_screen.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/language_service.dart';
 import '../../main.dart';
@@ -95,7 +96,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
         slivers: [
           // App Bar with Profile Header
           SliverAppBar(
-            expandedHeight: 220,
+            expandedHeight: 320, // Increased to fit larger profile image and text without overflow
             floating: false,
             pinned: true,
             backgroundColor: AppColors.primary,
@@ -115,15 +116,17 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                       const SizedBox(height: 20),
                       // Profile Photo
                       Container(
-                        width: 90,
-                        height: 90,
+                        width: 110,
+                        height: 110,
+                        padding: const EdgeInsets.all(4), // Space between border and image
                         decoration: BoxDecoration(
+                          color: Colors.white,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 4),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.2),
                               blurRadius: 20,
+                              offset: const Offset(0, 10),
                             ),
                           ],
                         ),
@@ -131,12 +134,12 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                           child: _profile?.photoURL != null
                               ? Image.network(_profile!.photoURL!, fit: BoxFit.cover)
                               : Container(
-                                  color: Colors.white,
+                                  color: Colors.grey.shade100,
                                   child: Center(
                                     child: Text(
                                       _profile?.fullName[0].toUpperCase() ?? 'W',
                                       style: TextStyle(
-                                        fontSize: 36,
+                                        fontSize: 40,
                                         fontWeight: FontWeight.bold,
                                         color: AppColors.primary,
                                       ),
@@ -149,19 +152,31 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                       Text(
                         _profile?.fullName ?? l10n.translate('worker'),
                         style: const TextStyle(
-                          fontSize: 22,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 8),
                       Text(
                         _profile?.phoneNumber ?? '',
                         style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 15,
+                          color: Colors.white.withOpacity(0.9),
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
+                      if (_profile?.email != null && _profile!.email!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          _profile!.email!,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.white.withOpacity(0.8),
+                            // Removed italic to prevent 'latching' visual artifacts
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -194,6 +209,75 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
+                  // My Applications Card
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MyApplicationsScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [const Color(0xFF2196F3), const Color(0xFF1976D2)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF2196F3).withOpacity(0.3),
+                            blurRadius: 12,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: const Icon(Icons.assignment_ind_rounded, color: Colors.white, size: 28),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  l10n.translate('my_applications'),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(height: 6), // Increased spacing to prevent 'latching'
+                                Text(
+                                  l10n.translate('application_status'),
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white.withOpacity(0.9),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
+                        ],
+                      ),
+                    ),
+                  ),
+
                   // Info Cards
                   _buildInfoCard(
                     icon: Icons.location_on_outlined,

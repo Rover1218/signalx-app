@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:intl/date_symbol_data_local.dart'; // Import for date formatting
 import 'screens/splash_screen.dart';
 import 'constants/app_constants.dart';
 import 'services/language_service.dart';
@@ -19,6 +20,9 @@ void main() async {
 
   // Initialize Firebase
   await Firebase.initializeApp();
+
+  // Initialize date formatting
+  await initializeDateFormatting();
 
   // Initialize language service
   await languageService.init();
