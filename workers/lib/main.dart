@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'screens/auth/auth_wrapper.dart';
+import 'screens/splash_screen.dart';
 import 'constants/app_constants.dart';
 import 'services/language_service.dart';
 import 'l10n/app_localizations.dart';
@@ -127,7 +127,7 @@ class _WorkersAppState extends State<WorkersApp> {
           ),
         ),
       ),
-      home: const AuthWrapper(), // This will check auth state and route accordingly
+      home: const SplashScreen(), // Shows splash then routes to AuthWrapper
     );
   }
 }
