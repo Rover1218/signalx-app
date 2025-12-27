@@ -12,7 +12,8 @@ import '../auth/otp_login_screen.dart';
 import '../../l10n/app_localizations.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
-  const WorkerHomeScreen({super.key});
+  final Function(int) onSwitchTab;
+  const WorkerHomeScreen({super.key, required this.onSwitchTab});
 
   @override
   State<WorkerHomeScreen> createState() => _WorkerHomeScreenState();
@@ -81,65 +82,60 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     final l10n = AppLocalizations.of(context);
 
     if (_isLoading) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const CircularProgressIndicator(color: AppColors.primary),
-              const SizedBox(height: 16),
-              Text(
-                l10n.translate('loading'),
-                style: TextStyle(color: Colors.grey.shade600),
-              ),
-            ],
-          ),
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircularProgressIndicator(color: AppColors.primary),
+            const SizedBox(height: 16),
+            Text(
+              l10n.translate('loading'),
+              style: TextStyle(color: Colors.grey.shade600),
+            ),
+          ],
         ),
       );
     }
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
-      body: RefreshIndicator(
-        onRefresh: _loadData,
-        color: AppColors.primary,
-        child: CustomScrollView(
-          slivers: [
-            // App Bar with Profile
-            _buildSliverAppBar(),
-            
-            // Content
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Stats Row
-                    _buildStatsRow(),
-                    
-                    const SizedBox(height: 20),
-                    
-                    // AI Insights Card
-                    _buildAIInsightsCard(),
-                    
-                    const SizedBox(height: 20),
-                    
-                    // Recent Jobs
-                    _buildRecentJobsSection(),
-                    
-                    const SizedBox(height: 100),
-                  ],
-                ),
+    return RefreshIndicator(
+      onRefresh: _loadData,
+      color: AppColors.primary,
+      child: CustomScrollView(
+        slivers: [
+          // App Bar with Profile
+          _buildSliverAppBar(),
+          
+          // Content
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Stats Row
+                  _buildStatsRow(),
+                  
+                  const SizedBox(height: 20),
+                  
+                  // AI Insights Card
+                  _buildAIInsightsCard(),
+                  
+                  const SizedBox(height: 20),
+                  
+
+
+                  const SizedBox(height: 20),
+                  
+                  // Recent Jobs
+                  _buildRecentJobsSection(),
+                  
+                  const SizedBox(height: 100),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-      
-      // Bottom Navigation
-      bottomNavigationBar: _buildBottomNav(),
     );
   }
 
@@ -627,9 +623,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     return GestureDetector(
       onTap: () {
         if (type == 'jobs' || type == 'location') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen()));
+          widget.onSwitchTab(1); // Jobs Tab
         } else if (type == 'schemes') {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesScreen()));
+          widget.onSwitchTab(2); // Schemes Tab
         }
       },
       child: Container(
@@ -685,99 +681,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     );
   }
 
-  Widget _buildQuickActionsSection() {
-    final l10n = AppLocalizations.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          l10n.translate('quick_actions_title'),
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(child: _buildQuickAction(
-              l10n.translate('find_jobs'),
-              Icons.search_rounded,
-              AppColors.primary,
-              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen())),
-            )),
-            const SizedBox(width: 12),
-            Expanded(child: _buildQuickAction(
-              l10n.translate('nav_schemes'),
-              Icons.account_balance_wallet_rounded,
-              AppColors.secondary,
-              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesScreen())),
-            )),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(child: _buildQuickAction(
-              l10n.translate('ai_assistant'),
-              Icons.psychology_rounded,
-              AppColors.accent,
-              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AIAssistantScreen())),
-            )),
-            const SizedBox(width: 12),
-            Expanded(child: _buildQuickAction(
-              l10n.translate('nav_profile'),
-              Icons.person_rounded,
-              Colors.orange,
-              () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WorkerProfileScreen())),
-            )),
-          ],
-        ),
-      ],
-    );
-  }
 
-  Widget _buildQuickAction(String title, IconData icon, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Icon(icon, color: color, size: 28),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildRecentJobsSection() {
     final l10n = AppLocalizations.of(context);
@@ -810,7 +714,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               ],
             ),
             GestureDetector(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen())),
+              onTap: () => widget.onSwitchTab(1), // Jobs Tab
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
@@ -920,7 +824,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(18),
-          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen())),
+          onTap: () => widget.onSwitchTab(1), // Jobs Tab
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Row(
@@ -1028,93 +932,6 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       ],
     );
   }
-
-  Widget _buildBottomNav() {
-    final l10n = AppLocalizations.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 20,
-            offset: const Offset(0, -8),
-            spreadRadius: -4,
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.home_rounded, l10n.translate('nav_home'), true),
-              _buildNavItem(Icons.work_rounded, l10n.translate('nav_jobs'), false, onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen()));
-              }),
-              _buildNavItem(Icons.account_balance_rounded, l10n.translate('nav_schemes'), false, onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesScreen()));
-              }),
-              _buildNavItem(Icons.person_rounded, l10n.translate('nav_profile'), false, onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => const WorkerProfileScreen()));
-              }),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, bool isActive, {VoidCallback? onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: EdgeInsets.symmetric(
-          horizontal: isActive ? 16 : 12,
-          vertical: 8,
-        ),
-        decoration: BoxDecoration(
-          color: isActive ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isActive ? AppColors.primary : Colors.grey.shade400,
-              size: isActive ? 26 : 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: isActive ? 11 : 10,
-                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                color: isActive ? AppColors.primary : Colors.grey.shade500,
-                letterSpacing: 0.2,
-              ),
-            ),
-            if (isActive) ...[
-              const SizedBox(height: 4),
-              Container(
-                width: 5,
-                height: 5,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
 }
+
+

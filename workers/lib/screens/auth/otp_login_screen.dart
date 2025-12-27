@@ -6,7 +6,7 @@ import 'package:lottie/lottie.dart'; // Keep for future if needed, or use for th
 import '../../services/firebase_service.dart';
 import '../../constants/app_constants.dart';
 import 'worker_profile_setup_screen.dart';
-import '../dashboard/worker_home_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 import '../../l10n/app_localizations.dart';
 import '../../services/language_service.dart';
 import '../../main.dart';
@@ -157,7 +157,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const WorkerHomeScreen()),
+        MaterialPageRoute(builder: (context) => const DashboardScreen()),
       );
     }
   }

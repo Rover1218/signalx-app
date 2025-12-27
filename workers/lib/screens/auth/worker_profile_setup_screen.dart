@@ -4,7 +4,7 @@ import 'dart:io';
 import '../../services/firebase_service.dart';
 import '../../services/cloudinary_service.dart';
 import '../../constants/app_constants.dart';
-import '../dashboard/worker_home_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class WorkerProfileSetupScreen extends StatefulWidget {
   final String uid;
@@ -168,7 +168,7 @@ class _WorkerProfileSetupScreenState extends State<WorkerProfileSetupScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const WorkerHomeScreen(),
+          builder: (context) => const DashboardScreen(),
         ),
       );
     } catch (e) {

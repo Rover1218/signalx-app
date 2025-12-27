@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../services/firebase_service.dart';
 import 'otp_login_screen.dart';
 import 'worker_profile_setup_screen.dart';
-import '../dashboard/worker_home_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
@@ -44,7 +44,7 @@ class AuthWrapper extends StatelessWidget {
             }
 
             // Profile exists - go to home
-            return const WorkerHomeScreen();
+            return const DashboardScreen();
           },
         );
       },

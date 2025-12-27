@@ -49,7 +49,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
       setState(() {
         _messages.add({
           'type': 'ai',
-          'text': 'I apologize, but I\'m having trouble processing your request. Please try again.',
+          'text': 'দুঃখিত, আমি আপনার অনুরোধ প্রক্রিয়া করতে সমস্যায় পড়ছি। অনুগ্রহ করে আবার চেষ্টা করুন।',
         });
         _isLoading = false;
       });
@@ -91,7 +91,7 @@ class _AIAssistantScreenState extends State<AIAssistantScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Powered by Google Gemini AI - Ask anything about jobs, schemes, or livelihoods!',
+                    'Powered by Groq AI - বাংলায় উত্তর পান! সব প্রশ্নের উত্তর বাংলা ভাষায়।',
                     style: TextStyle(
                       color: AppColors.textPrimary,
                       fontWeight: FontWeight.w500,
