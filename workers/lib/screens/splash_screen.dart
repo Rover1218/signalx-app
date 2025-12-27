@@ -100,48 +100,65 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
 
-            // Page Indicators
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_pages.length, (index) {
-                return AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  width: _currentPage == index ? 24 : 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: _currentPage == index
-                        ? AppColors.primary
-                        : Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                );
-              }),
+            // Page Indicators with Smooth Animation
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(_pages.length, (index) {
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    width: _currentPage == index ? 32 : 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: _currentPage == index
+                          ? AppColors.primary
+                          : Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(5),
+                      boxShadow: _currentPage == index ? [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ] : [],
+                    ),
+                  );
+                }),
+              ),
             ),
 
             const SizedBox(height: 32),
 
-            // Get Started Button
+            // Get Started Button with Enhanced Design
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: 60,
                 child: ElevatedButton(
                   onPressed: _onGetStarted,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(28),
+                      borderRadius: BorderRadius.circular(30),
                     ),
                     elevation: 0,
+                    shadowColor: AppColors.primary.withOpacity(0.5),
+                  ).copyWith(
+                    overlayColor: WidgetStateProperty.all(
+                      Colors.white.withOpacity(0.1),
+                    ),
                   ),
                   child: const Text(
                     'Get Started',
                     style: TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),
@@ -161,45 +178,60 @@ class _SplashScreenState extends State<SplashScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Illustration Circle
+          // Illustration Circle with Enhanced Shadow
           Container(
-            width: 200,
-            height: 200,
+            width: 220,
+            height: 220,
             decoration: BoxDecoration(
               color: page.iconColor.withOpacity(0.1),
               shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: page.iconColor.withOpacity(0.3),
+                  blurRadius: 40,
+                  offset: const Offset(0, 15),
+                  spreadRadius: -5,
+                ),
+                BoxShadow(
+                  color: page.iconColor.withOpacity(0.15),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Icon(
               page.icon,
-              size: 100,
+              size: 110,
               color: page.iconColor,
             ),
           ),
 
-          const SizedBox(height: 48),
+          const SizedBox(height: 56),
 
-          // Title
+          // Title with Better Typography
           Text(
             page.title,
             textAlign: TextAlign.center,
             style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
+              fontSize: 34,
+              fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
               height: 1.2,
+              letterSpacing: -0.5,
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
-          // Subtitle
+          // Subtitle with Improved Readability
           Text(
             page.subtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 16,
               color: Colors.grey.shade600,
               height: 1.6,
+              letterSpacing: 0.2,
             ),
           ),
         ],
