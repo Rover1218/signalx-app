@@ -1,57 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../constants/app_constants.dart';
+import '../../l10n/app_localizations.dart';
 
 class SchemesScreen extends StatelessWidget {
   const SchemesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final schemes = [
       {
-        'name': 'MGNREGA',
-        'description': '100 days guaranteed employment for rural households',
-        'eligibility': 'Rural adults willing to do manual work',
+        'name': l10n.translate('scheme_mgnrega_name'),
+        'description': l10n.translate('scheme_mgnrega_desc'),
+        'eligibility': l10n.translate('scheme_mgnrega_elig'),
         'icon': Icons.construction,
         'color': Colors.green,
         'url': 'https://nrega.nic.in/',
       },
       {
-        'name': 'PM-SVANidhi',
-        'description': 'Micro-credit scheme for street vendors',
-        'eligibility': 'Street vendors with certificate',
+        'name': l10n.translate('scheme_pmsvanidhi_name'),
+        'description': l10n.translate('scheme_pmsvanidhi_desc'),
+        'eligibility': l10n.translate('scheme_pmsvanidhi_elig'),
         'icon': Icons.store,
         'color': Colors.blue,
         'url': 'https://pmsvanidhi.mohua.gov.in/',
       },
       {
-        'name': 'Lakshmir Bhandar',
-        'description': 'Cash transfer scheme for women (₹1,000-1,200/month)',
-        'eligibility': 'Women aged 25-60 in West Bengal',
+        'name': l10n.translate('scheme_lakshmir_name'),
+        'description': l10n.translate('scheme_lakshmir_desc'),
+        'eligibility': l10n.translate('scheme_lakshmir_elig'),
         'icon': Icons.account_balance_wallet,
         'color': Colors.purple,
         'url': 'https://wb.gov.in/portal/web/guest/lakshmir-bhandar',
       },
       {
-        'name': 'Karma Sathi Prakalpa',
-        'description': 'Employment facilitation and skill development',
-        'eligibility': 'Job seekers in West Bengal',
+        'name': l10n.translate('scheme_karma_name'),
+        'description': l10n.translate('scheme_karma_desc'),
+        'eligibility': l10n.translate('scheme_karma_elig'),
         'icon': Icons.work,
         'color': Colors.orange,
         'url': 'https://karmasathiprakalpa.wb.gov.in/',
       },
       {
-        'name': 'Bhabishyat Credit Card',
-        'description': 'Collateral-free loans up to ₹10 lakh',
-        'eligibility': 'Youth for self-employment/business',
+        'name': l10n.translate('scheme_credit_name'),
+        'description': l10n.translate('scheme_credit_desc'),
+        'eligibility': l10n.translate('scheme_credit_elig'),
         'icon': Icons.credit_card,
         'color': Colors.teal,
         'url': 'https://wbmsme.gov.in/bhabishyat-credit-card/',
       },
       {
-        'name': 'PM-KISAN',
-        'description': 'Direct income support for farmers (₹6,000/year)',
-        'eligibility': 'Farmer families',
+        'name': l10n.translate('scheme_pmkisan_name'),
+        'description': l10n.translate('scheme_pmkisan_desc'),
+        'eligibility': l10n.translate('scheme_pmkisan_elig'),
         'icon': Icons.agriculture,
         'color': Colors.brown,
         'url': 'https://pmkisan.gov.in/',
@@ -61,7 +63,7 @@ class SchemesScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Government Schemes'),
+        title: Text(l10n.translate('government_schemes')),
         elevation: 0,
       ),
       body: ListView.separated(
@@ -77,6 +79,7 @@ class SchemesScreen extends StatelessWidget {
   }
 
   Widget _buildSchemeCard(BuildContext context, Map<String, dynamic> scheme) {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -147,6 +150,7 @@ class SchemesScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Icon(Icons.check_circle, 
                       color: Colors.green.shade600,
@@ -155,7 +159,7 @@ class SchemesScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Eligibility: ${scheme['eligibility']}',
+                        '${l10n.translate('eligibility')}: ${scheme['eligibility']}',
                         style: TextStyle(
                           fontSize: 13,
                           color: Colors.grey.shade700,
@@ -172,9 +176,9 @@ class SchemesScreen extends StatelessWidget {
                       _openSchemeUrl(scheme['url'] as String);
                     },
                     icon: const Icon(Icons.open_in_new, size: 18),
-                    label: const Text(
-                      'Learn More',
-                      style: TextStyle(
+                    label: Text(
+                      l10n.translate('learn_more'),
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),

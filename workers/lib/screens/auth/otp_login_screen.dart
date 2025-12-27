@@ -7,6 +7,9 @@ import '../../services/firebase_service.dart';
 import '../../constants/app_constants.dart';
 import 'worker_profile_setup_screen.dart';
 import '../dashboard/worker_home_screen.dart';
+import '../../l10n/app_localizations.dart';
+import '../../services/language_service.dart';
+import '../../main.dart';
 
 class OTPLoginScreen extends StatefulWidget {
   const OTPLoginScreen({super.key});
@@ -35,8 +38,9 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
   }
 
   Future<void> _sendOTP() async {
+    final l10n = AppLocalizations.of(context);
     if (_phoneController.text.trim().length != 10) {
-      setState(() => _error = 'Please enter a valid 10-digit number');
+      setState(() => _error = l10n.translate('error_invalid_phone'));
       return;
     }
 
@@ -51,7 +55,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         if (mounted && _isLoading && !_otpSent) {
           setState(() {
             _isLoading = false;
-            _error = 'Request timed out. Try again.';
+            _error = 'Request timed out. Try again.'; // Generic fallback or add key
           });
         }
       });
@@ -92,8 +96,9 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
   }
 
   Future<void> _verifyOTP() async {
+    final l10n = AppLocalizations.of(context);
     if (_otpController.text.trim().length != 6) {
-      setState(() => _error = 'Please enter full 6-digit code');
+      setState(() => _error = l10n.translate('error_invalid_otp_len'));
       return;
     }
 
@@ -113,7 +118,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
       }
     } catch (e) {
       setState(() {
-        _error = 'Invalid OTP. Please try again.';
+        _error = l10n.translate('error_invalid_otp');
         _isLoading = false;
       });
     }
@@ -177,8 +182,14 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
                    });
                 },
               )
-            : const SizedBox.shrink(), // Or back to splash? 
-            // If it's the first screen, we might want no back button or exit app
+            : const SizedBox.shrink(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.language, color: Colors.black),
+            onPressed: _showLanguageBottomSheet,
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -192,6 +203,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
   // --- Screens ---
 
   Widget _buildPhoneScreen() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -209,18 +221,18 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         
         const SizedBox(height: 24),
         
-        const Text(
-          'Enter Phone Number',
-          style: TextStyle(
+        Text(
+          l10n.translate('enter_phone_title'),
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Enter your phone number\nWe\'ll send you a text verification code.',
-          style: TextStyle(
+        Text(
+          l10n.translate('enter_phone_subtitle'),
+          style: const TextStyle(
             fontSize: 14,
             color: Colors.grey,
             height: 1.5,
@@ -229,9 +241,9 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         const SizedBox(height: 32),
 
         // Input
-        const Text(
-          'Mobile number',
-          style: TextStyle(
+        Text(
+          l10n.translate('mobile_number'),
+          style: const TextStyle(
             fontSize: 12,
             color: Colors.grey,
             fontWeight: FontWeight.w500,
@@ -243,7 +255,6 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
           decoration: BoxDecoration(
             color: Colors.grey.shade50,
             borderRadius: BorderRadius.circular(8),
-            // border: Border.all(color: Colors.grey.shade200), // Optional border
           ),
           child: Row(
             children: [
@@ -274,9 +285,9 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
                     fontSize: 16, 
                     fontWeight: FontWeight.w600
                   ),
-                  decoration: const InputDecoration(
-                    hintText: 'Enter your number',
-                    hintStyle: TextStyle(color: Colors.black26),
+                  decoration: InputDecoration(
+                    hintText: l10n.translate('enter_number_hint'),
+                    hintStyle: const TextStyle(color: Colors.black26),
                     border: InputBorder.none,
                     isDense: true,
                   ),
@@ -313,20 +324,20 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
             ),
             child: _isLoading 
               ? const CircularProgressIndicator(color: Colors.white)
-              : const Row(
+              : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'CONTINUE',
-                      style: TextStyle(
+                      l10n.translate('continue').toUpperCase(),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         letterSpacing: 1,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.arrow_forward, color: Colors.white, size: 20),
                   ],
                 ),
           ),
@@ -337,17 +348,10 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
   }
 
   Widget _buildVerifyCodeScreen() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // const Text(
-        //   'Verify Code',
-        //   style: TextStyle(
-        //     fontSize: 24,
-        //     fontWeight: FontWeight.bold,
-        //   ),
-        // ),
-        // const SizedBox(height: 32),
         
         // Illustration placeholder
         Center(
@@ -367,10 +371,10 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         ),
         const SizedBox(height: 24),
         
-        const Center(
+        Center(
           child: Text(
-            'Enter code',
-            style: TextStyle(
+            l10n.translate('enter_code'),
+            style: const TextStyle(
               fontSize: 22, 
               fontWeight: FontWeight.bold
             ),
@@ -379,7 +383,7 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
         const SizedBox(height: 8),
         Center(
           child: Text(
-            'Please type the verification code \nsent to +91 ${_phoneController.text}',
+            '${l10n.translate('verify_subtitle')} +91 ${_phoneController.text}',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 14,
@@ -421,20 +425,20 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
             ),
              child: _isLoading 
               ? const CircularProgressIndicator(color: Colors.white)
-              : const Row(
+              : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'CONTINUE',
-                      style: TextStyle(
+                      l10n.translate('continue').toUpperCase(),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         letterSpacing: 1,
                       ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                    const SizedBox(width: 8),
+                    const Icon(Icons.arrow_forward, color: Colors.white, size: 20),
                   ],
                 ),
           ),
@@ -447,15 +451,16 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
           child: Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text(
-                'If you didn\'t receive a code? ',
-                style: TextStyle(color: Colors.black54, fontSize: 13),
+              Text(
+                l10n.translate('didnt_receive_code'),
+                style: const TextStyle(color: Colors.black54, fontSize: 13),
               ),
+              const SizedBox(width: 4),
               GestureDetector(
                 onTap: _isLoading ? null : _sendOTP,
-                child: const Text(
-                  'Resend',
-                  style: TextStyle(
+                child: Text(
+                  l10n.translate('resend'),
+                  style: const TextStyle(
                     color: AppColors.primary, 
                     fontWeight: FontWeight.bold,
                     fontSize: 13
@@ -537,6 +542,60 @@ class _OTPLoginScreenState extends State<OTPLoginScreen> {
           ),
         ],
       ),
+    );
+  }
+  void _showLanguageBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context).translate('select_language'),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ...LanguageService.supportedLanguages.map((lang) {
+                final isSelected =
+                    languageService.currentLocale.languageCode == lang.code;
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Text(
+                    lang.flag,
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  title: Text(
+                    lang.nativeName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? AppColors.primary : Colors.black87,
+                    ),
+                  ),
+                  subtitle: Text(lang.name),
+                  trailing: isSelected
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    languageService.changeLanguage(lang.code);
+                    Navigator.pop(context);
+                  },
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
     );
   }
 }

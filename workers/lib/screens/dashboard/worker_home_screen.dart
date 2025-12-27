@@ -9,6 +9,7 @@ import '../schemes/schemes_screen.dart';
 import '../ai/ai_assistant_screen.dart';
 import '../profile/worker_profile_screen.dart';
 import '../auth/otp_login_screen.dart';
+import '../../l10n/app_localizations.dart';
 
 class WorkerHomeScreen extends StatefulWidget {
   const WorkerHomeScreen({super.key});
@@ -77,6 +78,8 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (_isLoading) {
       return Scaffold(
         backgroundColor: Colors.white,
@@ -87,7 +90,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               const CircularProgressIndicator(color: AppColors.primary),
               const SizedBox(height: 16),
               Text(
-                'Loading your dashboard...',
+                l10n.translate('loading'),
                 style: TextStyle(color: Colors.grey.shade600),
               ),
             ],
@@ -141,6 +144,8 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Widget _buildSliverAppBar() {
+    final l10n = AppLocalizations.of(context);
+    
     return SliverAppBar(
       expandedHeight: 170,
       floating: false,
@@ -210,7 +215,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Welcome back,',
+                              l10n.translate('welcome_back_user'),
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.85),
                                 fontSize: 13,
@@ -219,7 +224,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _profile?.fullName ?? 'Worker',
+                              _profile?.fullName ?? l10n.translate('worker'),
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 22,
@@ -236,7 +241,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
-                                    _profile?.location ?? 'Location not set',
+                                    _profile?.location ?? l10n.translate('not_set'),
                                     style: TextStyle(
                                       color: Colors.white.withOpacity(0.9),
                                       fontSize: 12,
@@ -264,13 +269,15 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Widget _buildStatsRow() {
+    final l10n = AppLocalizations.of(context);
+    
     return Row(
       children: [
-        Expanded(child: _buildStatCard('Recommended', '${_recommendedJobs.length}', Icons.work_outline, AppColors.primary)),
+        Expanded(child: _buildStatCard(l10n.translate('recommended'), '${_recommendedJobs.length}', Icons.work_outline, AppColors.primary)),
         const SizedBox(width: 12),
-        Expanded(child: _buildStatCard('Rating', '${_profile?.rating ?? 0}', Icons.star_outline, AppColors.secondary)),
+        Expanded(child: _buildStatCard(l10n.translate('rating'), '${_profile?.rating ?? 0}', Icons.star_outline, AppColors.secondary)),
         const SizedBox(width: 12),
-        Expanded(child: _buildStatCard('Skills', '${_profile?.skills.length ?? 0}', Icons.construction_outlined, AppColors.accent)),
+        Expanded(child: _buildStatCard(l10n.translate('skills'), '${_profile?.skills.length ?? 0}', Icons.construction_outlined, AppColors.accent)),
       ],
     );
   }
@@ -298,7 +305,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
-        ],
+          ],
       ),
       child: Column(
         children: [
@@ -338,6 +345,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Widget _buildAIInsightsCard() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -367,9 +375,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                 child: const Icon(Icons.auto_awesome, color: Colors.white, size: 22),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'AI Insights',
-                style: TextStyle(
+              Text(
+                l10n.translate('ai_insights'),
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -382,9 +390,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                   color: AppColors.accent,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'NEW',
-                  style: TextStyle(
+                child: Text(
+                  l10n.translate('new_badge'),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -396,11 +404,23 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           
           const SizedBox(height: 20),
           
-          _buildInsightItem(Icons.work, '${_recommendedJobs.length} jobs match your skills', AppColors.primary),
+          _buildInsightItem(
+            Icons.work, 
+            '${_recommendedJobs.length} ${l10n.translate('jobs_match_skills')}', 
+            AppColors.primary
+          ),
           const SizedBox(height: 12),
-          _buildInsightItem(Icons.account_balance, '2 government schemes available', AppColors.secondary),
+          _buildInsightItem(
+            Icons.account_balance, 
+            '2 ${l10n.translate('schemes_available')}', 
+            AppColors.secondary
+          ),
           const SizedBox(height: 12),
-          _buildInsightItem(Icons.location_on, 'MGNREGA work in your block', Colors.orange),
+          _buildInsightItem(
+            Icons.location_on, 
+            l10n.translate('work_in_block'), 
+            Colors.orange
+          ),
         ],
       ),
     );
@@ -433,12 +453,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Widget _buildQuickActionsSection() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Quick Actions',
-          style: TextStyle(
+        Text(
+          l10n.translate('quick_actions_title'),
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
             color: AppColors.textPrimary,
@@ -448,14 +469,14 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         Row(
           children: [
             Expanded(child: _buildQuickAction(
-              'Find Jobs',
+              l10n.translate('find_jobs'),
               Icons.search_rounded,
               AppColors.primary,
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen())),
             )),
             const SizedBox(width: 12),
             Expanded(child: _buildQuickAction(
-              'Schemes',
+              l10n.translate('nav_schemes'),
               Icons.account_balance_wallet_rounded,
               AppColors.secondary,
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesScreen())),
@@ -466,14 +487,14 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         Row(
           children: [
             Expanded(child: _buildQuickAction(
-              'AI Assistant',
+              l10n.translate('ai_assistant'),
               Icons.psychology_rounded,
               AppColors.accent,
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AIAssistantScreen())),
             )),
             const SizedBox(width: 12),
             Expanded(child: _buildQuickAction(
-              'My Profile',
+              l10n.translate('nav_profile'),
               Icons.person_rounded,
               Colors.orange,
               () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WorkerProfileScreen())),
@@ -526,15 +547,16 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Widget _buildRecentJobsSection() {
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Recent Jobs',
-              style: TextStyle(
+            Text(
+              l10n.translate('recent_jobs_title'),
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 color: AppColors.textPrimary,
@@ -543,7 +565,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
             GestureDetector(
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen())),
               child: Text(
-                'See All',
+                l10n.translate('see_all'),
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -568,7 +590,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                   Icon(Icons.work_off_outlined, size: 48, color: Colors.grey.shade400),
                   const SizedBox(height: 12),
                   Text(
-                    'No jobs available yet',
+                    l10n.translate('no_jobs_yet'),
                     style: TextStyle(color: Colors.grey.shade600),
                   ),
                 ],
@@ -576,12 +598,29 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
             ),
           )
         else
-          ...(_recommendedJobs.map((job) => _buildJobCard(job)).toList()),
+          ...(_recommendedJobs.map((job) => _buildJobCard(job, l10n)).toList()), // Pass l10n here
       ],
     );
   }
 
-  Widget _buildJobCard(Job job) {
+  Widget _buildJobCard(Job job, AppLocalizations l10n) {
+    // Helper to translate dynamic text - duplicated from JobListingsScreen for now as it's a small helper
+    String getTranslatedJobText(String text) {
+        if (text.isEmpty) return text;
+        final directKey = 'job_$text';
+        final translated = l10n.translate(directKey);
+        if (translated != directKey) return translated;
+        if (text.toLowerCase().contains('urgent')) {
+           return '${l10n.translate('urgent')} - $text'; 
+        }
+        return text;
+    }
+
+    String displayTime = job.timeAgo;
+    if (displayTime == 'Just now') {
+      displayTime = l10n.translate('just_now');
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -613,7 +652,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  job.title,
+                  getTranslatedJobText(job.title),
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
@@ -622,7 +661,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  job.employerName,
+                  getTranslatedJobText(job.employerName),
                   style: TextStyle(
                     fontSize: 13,
                     color: Colors.grey.shade600,
@@ -655,7 +694,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              job.timeAgo,
+              displayTime,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
@@ -669,6 +708,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   }
 
   Widget _buildBottomNav() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -686,14 +726,14 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(Icons.home_rounded, 'Home', true),
-              _buildNavItem(Icons.search_rounded, 'Jobs', false, onTap: () {
+              _buildNavItem(Icons.home_rounded, l10n.translate('nav_home'), true),
+              _buildNavItem(Icons.search_rounded, l10n.translate('nav_jobs'), false, onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const JobListingsScreen()));
               }),
-              _buildNavItem(Icons.account_balance_wallet_rounded, 'Schemes', false, onTap: () {
+              _buildNavItem(Icons.account_balance_wallet_rounded, l10n.translate('nav_schemes'), false, onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const SchemesScreen()));
               }),
-              _buildNavItem(Icons.person_rounded, 'Profile', false, onTap: () {
+              _buildNavItem(Icons.person_rounded, l10n.translate('nav_profile'), false, onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (_) => const WorkerProfileScreen()));
               }),
             ],

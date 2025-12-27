@@ -5,6 +5,9 @@ import '../../models/worker_profile.dart';
 import '../../constants/app_constants.dart';
 import '../auth/otp_login_screen.dart';
 import 'edit_profile_screen.dart';
+import '../../l10n/app_localizations.dart';
+import '../../services/language_service.dart';
+import '../../main.dart';
 
 class WorkerProfileScreen extends StatefulWidget {
   const WorkerProfileScreen({super.key});
@@ -41,17 +44,18 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
   }
 
   Future<void> _logout() async {
+    final l10n = AppLocalizations.of(context);
     // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: Text(l10n.translate('logout')),
+        content: Text(l10n.translate('logout_confirm')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.translate('cancel')),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -59,7 +63,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Logout'),
+            child: Text(l10n.translate('logout')),
           ),
         ],
       ),
@@ -77,6 +81,8 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -141,7 +147,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        _profile?.fullName ?? 'Worker',
+                        _profile?.fullName ?? l10n.translate('worker'),
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -161,7 +167,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                 ),
               ),
             ),
-            title: const Text('My Profile'),
+            title: Text(l10n.translate('my_profile')),
             actions: [
               IconButton(
                 icon: const Icon(Icons.edit, color: Colors.white),
@@ -191,27 +197,32 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                   // Info Cards
                   _buildInfoCard(
                     icon: Icons.location_on_outlined,
-                    title: 'Location',
-                    value: _profile?.location ?? 'Not set',
+                    title: l10n.translate('location'),
+                    value: _profile?.location ?? l10n.translate('not_set'),
                     color: AppColors.primary,
                   ),
                   const SizedBox(height: 12),
                   _buildInfoCard(
                     icon: Icons.work_history_outlined,
-                    title: 'Experience',
-                    value: '${_profile?.experienceYears ?? 0} years',
+                    title: l10n.translate('experience'),
+                    value: '${_profile?.experienceYears ?? 0} ${l10n.translate('years')}',
                     color: AppColors.secondary,
                   ),
                   const SizedBox(height: 12),
                   _buildInfoCard(
                     icon: Icons.school_outlined,
-                    title: 'Education',
-                    value: _profile?.educationLevel ?? 'Not specified',
+                    title: l10n.translate('education'),
+                    value: _getTranslatedEducation(l10n, _profile?.educationLevel) ?? l10n.translate('not_specified'),
                     color: AppColors.accent,
                   ),
                   
                   const SizedBox(height: 20),
                   
+                  // Language Card
+                  _buildLanguageCard(),
+                  
+                  const SizedBox(height: 20),
+
                   // Skills Card
                   _buildSkillsCard(),
                   
@@ -228,9 +239,9 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                     child: OutlinedButton.icon(
                       onPressed: _logout,
                       icon: const Icon(Icons.logout, color: Colors.red),
-                      label: const Text(
-                        'Logout',
-                        style: TextStyle(
+                      label: Text(
+                        l10n.translate('logout'),
+                        style: const TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.w600,
                         ),
@@ -252,6 +263,126 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  String? _getTranslatedEducation(AppLocalizations l10n, String? education) {
+    if (education == null) return null;
+    return l10n.translate('edu_$education');
+  }
+
+  Widget _buildLanguageCard() {
+    final l10n = AppLocalizations.of(context);
+    final currentLang = languageService.getCurrentLanguage();
+
+    return GestureDetector(
+      onTap: _showLanguageBottomSheet,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.language, color: Colors.purple, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.translate('language'),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${currentLang.flag}  ${currentLang.nativeName}',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right, color: Colors.grey),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showLanguageBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context).translate('select_language'),
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ...LanguageService.supportedLanguages.map((lang) {
+                final isSelected =
+                    languageService.currentLocale.languageCode == lang.code;
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: Text(
+                    lang.flag,
+                    style: const TextStyle(fontSize: 24),
+                  ),
+                  title: Text(
+                    lang.nativeName,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      color: isSelected ? AppColors.primary : Colors.black87,
+                    ),
+                  ),
+                  subtitle: Text(lang.name),
+                  trailing: isSelected
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () {
+                    languageService.changeLanguage(lang.code);
+                    Navigator.pop(context);
+                  },
+                );
+              }).toList(),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -314,6 +445,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
   }
 
   Widget _buildSkillsCard() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -342,9 +474,9 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                 child: const Icon(Icons.construction, color: AppColors.primary, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'Skills',
-                style: TextStyle(
+              Text(
+                l10n.translate('skills'),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -364,7 +496,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  skill,
+                  l10n.translate('skill_$skill'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
@@ -380,6 +512,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
   }
 
   Widget _buildJobTypesCard() {
+    final l10n = AppLocalizations.of(context);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -408,9 +541,9 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                 child: const Icon(Icons.work_outline, color: AppColors.secondary, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'Preferred Job Types',
-                style: TextStyle(
+              Text(
+                l10n.translate('preferred_job_types'),
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                   color: AppColors.textPrimary,
@@ -430,7 +563,7 @@ class _WorkerProfileScreenState extends State<WorkerProfileScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  type,
+                  l10n.translate('job_type_$type'),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w500,
