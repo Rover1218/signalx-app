@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_constants.dart';
 import 'auth/auth_wrapper.dart';
 
@@ -41,7 +42,12 @@ class _SplashScreenState extends State<SplashScreen> {
     super.dispose();
   }
 
-  void _onGetStarted() {
+  Future<void> _onGetStarted() async {
+    // Mark that user has seen the splash screen
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('has_seen_splash', true);
+    
+    if (!mounted) return;
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const AuthWrapper()),
