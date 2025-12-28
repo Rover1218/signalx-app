@@ -61,17 +61,8 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
             pinned: true,
             elevation: 0,
             backgroundColor: const Color(0xFF1E3A8A),
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
+            leading: null,
+            automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(
@@ -562,6 +553,12 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
                             l10n.translate('salary'),
                             job.salary,
                           ),
+                          const SizedBox(height: 12),
+                          _buildDetailRow(
+                            Icons.work_outline,
+                            l10n.translate('preferred_job_types'),
+                            _getTranslatedJobType(job.jobType, l10n),
+                          ),
 
                           const SizedBox(height: 24),
 
@@ -733,6 +730,16 @@ class _JobListingsScreenState extends State<JobListingsScreen> {
         ),
       );
     }
+  }
+
+  String _getTranslatedJobType(String type, AppLocalizations l10n) {
+    if (type.isEmpty) return type;
+    String key = 'job_type_$type';
+    String translated = l10n.translate(key);
+    // If translation key is returned (meaning missing), return original
+    // Use proper check against key name
+    if (translated == key) return type;
+    return translated;
   }
 
   String _getTranslatedJobText(String text, AppLocalizations l10n) {

@@ -1,3 +1,4 @@
+import 'dart:async'; // Add import
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,8 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  Timer? _navigationTimer;
+  Timer? _rotationTimer;
 
   final List<OnboardingPage> _pages = [
     OnboardingPage(
@@ -37,13 +40,35 @@ class _SplashScreenState extends State<SplashScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Auto-redirect after 5 seconds
+    _navigationTimer = Timer(const Duration(seconds: 5), _onGetStarted);
+    
+    // Auto-rotate pages every 1.5 seconds
+    _rotationTimer = Timer.periodic(const Duration(milliseconds: 1500), (timer) {
+      if (_currentPage < _pages.length - 1) {
+        _currentPage++;
+        if (_pageController.hasClients) {
+          _pageController.animateToPage(
+            _currentPage,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeInOut,
+          );
+        }
+      }
+    });
+  }
+
+  @override
   void dispose() {
+    _navigationTimer?.cancel();
+    _rotationTimer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
 
   Future<void> _onGetStarted() async {
-    // Mark that user has seen the splash screen
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('has_seen_splash', true);
     
@@ -106,9 +131,9 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
 
-            // Page Indicators with Smooth Animation
+            // Page Indicators
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.only(bottom: 30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(_pages.length, (index) {
@@ -136,42 +161,18 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
 
-            const SizedBox(height: 32),
-
-            // Get Started Button with Enhanced Design
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+            // Loader
+            const Padding(
+              padding: EdgeInsets.only(bottom: 40),
               child: SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: _onGetStarted,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    elevation: 0,
-                    shadowColor: AppColors.primary.withOpacity(0.5),
-                  ).copyWith(
-                    overlayColor: WidgetStateProperty.all(
-                      Colors.white.withOpacity(0.1),
-                    ),
-                  ),
-                  child: const Text(
-                    'Get Started',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                 ),
               ),
             ),
-
-            const SizedBox(height: 32),
           ],
         ),
       ),

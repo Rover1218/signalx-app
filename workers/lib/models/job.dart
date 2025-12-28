@@ -12,6 +12,7 @@ class Job {
   final String employerId;
   final bool isPublic;
   final List<String> skills;
+  final String jobType;
   final DateTime? scheduledDate;
   final DateTime createdAt;
 
@@ -29,6 +30,7 @@ class Job {
     required this.employerId,
     this.isPublic = true,
     required this.skills,
+    this.jobType = 'Daily Wage', // Default
     this.scheduledDate,
     required this.createdAt,
   });
@@ -48,6 +50,7 @@ class Job {
       employerId: map['recruiterId'] ?? '',
       isPublic: map['isPublic'] ?? true,
       skills: List<String>.from(map['skills'] ?? []),
+      jobType: map['jobType'] ?? 'Daily Wage',
       scheduledDate: map['scheduledDate']?.toDate(),
       createdAt: map['createdAt']?.toDate() ?? DateTime.now(),
     );
@@ -67,6 +70,8 @@ class Job {
       'employerPhoto': employerPhoto,
       'employerId': employerId,
       'isPublic': isPublic,
+      'skills': skills,
+      'jobType': jobType,
       'scheduledDate': scheduledDate,
       'createdAt': createdAt,
     };

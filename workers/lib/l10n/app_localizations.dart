@@ -592,11 +592,11 @@ class AppLocalizations {
       'government_schemes': 'সরকারি প্রকল্পসমূহ',
       'learn_more': 'আরও জানুন',
       'eligibility': 'যোগ্যতা',
-      'ai_insights': 'এআই ইনসাইটস',
+      'ai_insights': 'এআই পরামর্শ',
       'new_badge': 'নতুন',
       'jobs_match_skills': 'টি কাজ আপনার দক্ষতার সাথে মিলছে',
       'schemes_available': 'টি সরকারি প্রকল্প উপলব্ধ',
-      'work_in_block': 'আপনার ব্লকে এমজিএনআরইজিএ কাজ',
+      'work_in_block': 'আপনার ব্লকে ১০০ দিনের কাজ',
       'see_all': 'সব দেখুন',
       'recent_jobs_title': 'সাম্প্রতিক কাজ',
       'quick_actions_title': 'দ্রুত অ্যাকশন',
@@ -608,7 +608,7 @@ class AppLocalizations {
       'no_jobs_yet': 'এখনও কোন কাজ উপলব্ধ নেই',
 
       // Schemes
-      'scheme_mgnrega_name': 'এমজিএনআরইজিএ (১০০ দিনের কাজ)',
+      'scheme_mgnrega_name': '১০০ দিনের কাজ (MGNREGA)',
       'scheme_mgnrega_desc': 'গ্রামীণ পরিবারের জন্য ১০০ দিনের নিশ্চিত কর্মসংস্থান',
       'scheme_mgnrega_elig': 'শারীরিক শ্রমে ইচ্ছুক গ্রামীণ প্রাপ্তবয়স্করা',
       

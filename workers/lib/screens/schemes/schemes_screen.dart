@@ -77,17 +77,8 @@ class SchemesScreen extends StatelessWidget {
             pinned: true,
             elevation: 0,
             backgroundColor: const Color(0xFF1E3A8A),
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
+            leading: null,
+            automaticallyImplyLeading: false,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
                 decoration: const BoxDecoration(

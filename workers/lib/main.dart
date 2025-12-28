@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/date_symbol_data_local.dart'; // Import for date formatting
 import 'screens/auth/auth_wrapper.dart';
+import 'screens/splash_screen.dart';
 import 'constants/app_constants.dart';
 import 'services/language_service.dart';
 import 'l10n/app_localizations.dart';
@@ -131,7 +132,7 @@ class _WorkersAppState extends State<WorkersApp> {
           ),
         ),
       ),
-      home: const AuthWrapper(), // Smart routing: splash for new users, dashboard for logged in
+      home: const SplashScreen(), // Always show splash first
     );
   }
 }
