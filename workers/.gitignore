@@ -42,6 +42,11 @@ app.*.map.json
 # Environment files
 .env
 
+# Firebase sensitive configuration files
+google-services.json
+GoogleService-Info.plist
+firebase-adminsdk-*.json
+
 # Android Studio will place build artifacts here
 /android/app/debug
 /android/app/profile
